@@ -115,7 +115,7 @@ http://localhost:5000
 - Wait 1-2 hours for the API key to activate
 - Check the key in `.env` matches: `17dfdc56fd57a7a98261541bb6405a24`
 - Verify internet connection
-- Try accessing: `http://api.openweathermap.org/data/2.5/weather?q=London&APPID=17dfdc56fd57a7a98261541bb6405a24`
+- Try accessing: 
 
 ### Issue: Port 5000 already in use
 **Solution**: Change the PORT in `.env` file:
