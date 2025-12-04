@@ -149,11 +149,14 @@ export default function VoiceAgent() {
         setContext(data.context);
 
         if (voiceEnabled) {
-          try {
-            await speak(data.response);
-          } catch {
-            console.log("Initial speech failed");
-          }
+          // Add a small delay to ensure speech synthesis is ready
+          setTimeout(async () => {
+            try {
+              await speak(data.response);
+            } catch (err) {
+              console.log("Initial speech failed:", err);
+            }
+          }, 500);
         }
       } catch (error) {
         console.error("Failed to initialize greeting:", error);
