@@ -58,7 +58,7 @@ Edit the `.env` file in the root directory:
 
 ```env
 # OpenWeather API Configuration
-OPENWEATHER_API_KEY=17dfdc56fd57a7a98261541bb6405a24
+OPENWEATHER_API_KEY=openweather_api_key_here
 
 # Google Gemini API Configuration
 # Get your API key from: https://makersuite.google.com/app/apikey
