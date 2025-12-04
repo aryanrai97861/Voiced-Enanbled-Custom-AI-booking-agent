@@ -1,4 +1,21 @@
+/**
+ * Web Speech API Hook
+ * 
+ * Custom React hook that provides speech recognition (STT) and synthesis (TTS) capabilities
+ * using the browser's Web Speech API. Includes automatic retry logic for network errors
+ * and graceful error handling.
+ * 
+ * Features:
+ * - Speech-to-text (recognition)
+ * - Text-to-speech (synthesis)
+ * - Automatic retry on network errors (up to 3 attempts)
+ * - Real-time transcript updates
+ * - Error state management
+ */
+
 import { useState, useCallback, useRef, useEffect } from "react";
+
+// TypeScript interfaces for Web Speech API (not included in standard types)
 
 interface SpeechRecognitionEvent extends Event {
   resultIndex: number;
@@ -68,6 +85,24 @@ interface UseSpeechReturn {
   isSupported: boolean;
 }
 
+/**
+ * React hook for speech recognition and synthesis
+ * 
+ * @param options - Configuration options
+ * @param options.onResult - Callback when final transcript is available
+ * @param options.onTranscript - Alias for onResult
+ * @param options.onError - Callback when an error occurs
+ * @param options.continuous - Whether to continuously listen (default: false)
+ * @param options.language - Recognition language (default: "en-US")
+ * 
+ * @returns Object with speech control functions and state
+ * 
+ * @example
+ * const { startListening, speak, transcript, error } = useSpeech({
+ *   onResult: (text) => console.log('User said:', text),
+ *   onError: (err) => console.error('Speech error:', err)
+ * });
+ */
 export function useSpeech(options: UseSpeechOptions = {}): UseSpeechReturn {
   const { 
     onResult, 

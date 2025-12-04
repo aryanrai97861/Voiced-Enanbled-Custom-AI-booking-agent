@@ -1,6 +1,14 @@
+/**
+ * Gemini AI Integration Module
+ * 
+ * This module handles all interactions with Google's Gemini AI for conversational booking.
+ * It processes user messages, extracts booking information, and manages the conversation flow.
+ */
+
 import { GoogleGenAI } from "@google/genai";
 import type { BookingContext, ChatResponse } from "@shared/schema";
 
+// Initialize Gemini AI with API key from environment variables
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 const SYSTEM_PROMPT = `You are a friendly and professional restaurant booking assistant. Your goal is to help customers book a table at our restaurant through natural conversation.
@@ -50,6 +58,16 @@ Response format: You must respond with a JSON object:
   "isConfirmed": true if user confirmed the booking, false otherwise
 }`;
 
+/**
+ * Process a conversation turn with the AI
+ * 
+ * This function sends the user's message and current booking context to Gemini AI,
+ * which returns a natural language response and updates the booking context.
+ * 
+ * @param userMessage - The user's input message
+ * @param context - Current booking context with collected information
+ * @returns Promise<ChatResponse> - AI response with updated context
+ */
 export async function processConversation(
   userMessage: string,
   context: BookingContext
@@ -93,6 +111,12 @@ Respond with only the JSON object, no additional text.`;
   }
 }
 
+/**
+ * Build a human-readable summary of the current booking context
+ * 
+ * @param context - Current booking context
+ * @returns String summary of collected information
+ */
 function buildContextSummary(context: BookingContext): string {
   const parts: string[] = [];
   
@@ -111,6 +135,16 @@ function buildContextSummary(context: BookingContext): string {
   return parts.length > 0 ? parts.join("\n") : "No information collected yet.";
 }
 
+/**
+ * Update booking context with newly extracted data from AI response
+ * 
+ * Merges the AI's extracted data into the existing context, preserving
+ * any previously collected information.
+ * 
+ * @param context - Current booking context
+ * @param parsed - Parsed AI response containing extracted data and next step
+ * @returns Updated booking context
+ */
 function updateContext(
   context: BookingContext,
   parsed: {
@@ -160,6 +194,16 @@ function isValidStep(step: string): boolean {
   return validSteps.includes(step);
 }
 
+/**
+ * Create a fallback response when AI fails or returns invalid data
+ * 
+ * Provides rule-based responses for common scenarios like greetings,
+ * name collection, and guest count collection.
+ * 
+ * @param userMessage - The user's message
+ * @param context - Current booking context
+ * @returns ChatResponse with a sensible fallback
+ */
 function createFallbackResponse(
   userMessage: string,
   context: BookingContext
@@ -199,6 +243,16 @@ function createFallbackResponse(
   };
 }
 
+/**
+ * Generate weather-based seating recommendation
+ * 
+ * Analyzes weather conditions and temperature to suggest optimal seating:
+ * - Outdoor seating for comfortable weather (10-30°C, clear conditions)
+ * - Indoor seating for rain, extreme temperatures, or poor weather
+ * 
+ * @param weatherInfo - Current weather information with temperature and conditions
+ * @returns String recommendation for indoor or outdoor seating
+ */
 export function generateSeatingResponse(
   weatherCondition: string,
   temperature: number

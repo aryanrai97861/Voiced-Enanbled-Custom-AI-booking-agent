@@ -1,3 +1,24 @@
+/**
+ * Voice Agent Component
+ * 
+ * Main component for the voice-enabled restaurant booking interface.
+ * Handles the complete booking flow from greeting to confirmation.
+ * 
+ * Features:
+ * - Voice input/output using Web Speech API
+ * - Text input fallback for accessibility
+ * - Real-time conversation display
+ * - Weather-based seating recommendations
+ * - Booking confirmation
+ * 
+ * Flow:
+ * 1. Initialize with greeting from AI
+ * 2. Collect booking details through conversation
+ * 3. Fetch weather and suggest seating
+ * 4. Confirm and create booking
+ * 5. Display booking confirmation
+ */
+
 import { useState, useCallback, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";

@@ -81,6 +81,132 @@ npm run dev
 
 The application will be available at `http://localhost:5000`
 
+## 💡 My Approach
+
+### Architecture Decision
+
+I chose a **full-stack TypeScript monorepo** architecture for this project to ensure:
+- **Type Safety**: Shared types between frontend and backend reduce runtime errors
+- **Developer Experience**: Single repository makes development faster
+- **Scalability**: Easy to extend with new features
+
+### Voice Integration Strategy
+
+**Primary: Web Speech API**
+- ✅ Browser-native, no external dependencies
+- ✅ Works offline (after initial setup)
+- ✅ Zero cost
+- ✅ Low latency
+- ⚠️ Requires Google's cloud services for recognition
+
+I chose Web Speech API over alternatives like Deepgram or AssemblyAI because:
+1. **Simplicity**: No SDK installation or complex setup
+2. **Cost**: Completely free
+3. **Performance**: Direct browser integration is fast
+4. **Accessibility**: Built-in browser support
+
+**Fallback: Text Input**
+- When speech fails (network issues, permissions), users can type
+- Ensures accessibility for users who can't/don't want to use voice
+- Maintains full functionality without voice
+
+### AI Conversation Design
+
+**Why Google Gemini?**
+- **Natural Language Understanding**: Excellent at extracting structured data from casual conversation
+- **Context Awareness**: Maintains conversation state
+- **Flexibility**: Handles variations in user input ("me and my wife" → 2 guests)
+- **Cost**: Free tier is generous
+- **Response Quality**: More conversational than GPT-3.5
+
+**Conversation Flow Strategy:**
+- **Step-by-step**: Ask for one piece of information at a time (avoids user overwhelm)
+- **Validation**: AI validates inputs (dates in future, guest count 1-20)
+- **Error Recovery**: If AI fails, rule-based fallback ensures continuity
+- **Contextual**: AI remembers previous information (doesn't re-ask)
+- **Flexible**: Handles changes mid-booking ("actually, change time to 8 PM")
+
+### Weather Integration Rationale
+
+I integrated real-time weather for:
+1. **User Experience**: Proactive seating suggestions based on conditions
+2. **Practical Value**: Helps users make informed decisions
+3. **Demonstration**: Shows ability to integrate third-party APIs
+4. **Realism**: Real restaurants consider weather for reservations
+
+**Weather Logic:**
+```javascript
+if (temperature > 30 || temperature < 10 || rainy) {
+  recommend: "Indoor seating"
+} else if (clear && comfortable) {
+  recommend: "Outdoor seating"
+}
+```
+
+### Data Storage Approach
+
+**Current: In-Memory Storage**
+- ✅ Fast development
+- ✅ No database setup required
+- ✅ Perfect for demo/prototype
+- ⚠️ Data lost on server restart
+
+**Future: MongoDB Integration**
+- Schema defined in `shared/schema.ts`
+- Easy migration path with Drizzle ORM
+- Connection setup ready in `storage.ts`
+
+### Code Quality Practices
+
+1. **TypeScript**: 100% type coverage
+2. **Zod Validation**: All API inputs validated
+3. **Error Handling**: Try-catch blocks with fallbacks
+4. **Comments**: Key functions documented
+5. **Separation of Concerns**: 
+   - UI components separate from logic
+   - API routes separate from business logic
+   - Shared types prevent duplication
+
+### User Experience Decisions
+
+1. **Visual Feedback**: Status badges, loading states, transcript display
+2. **Error Messages**: User-friendly, actionable
+3. **Dark Mode**: Reduces eye strain
+4. **Responsive Design**: Works on mobile/tablet/desktop
+5. **Accessibility**: 
+   - Text input fallback
+   - Keyboard navigation
+   - Screen reader friendly
+   - Color contrast compliance
+
+### Testing Strategy
+
+**Manual Testing:**
+- Complete booking flow (happy path)
+- Error scenarios (network failures, invalid inputs)
+- Edge cases (date parsing, name extraction)
+- Cross-browser (Chrome, Edge, Firefox)
+
+**Future Automated Testing:**
+- Unit tests for conversation logic
+- Integration tests for API endpoints
+- E2E tests for booking flow
+
+### Performance Optimizations
+
+1. **React Query**: Caching and efficient data fetching
+2. **Vite**: Fast HMR during development
+3. **Code Splitting**: Only load what's needed
+4. **Lazy Loading**: Components loaded on demand
+
+### Security Considerations
+
+1. **Environment Variables**: Sensitive keys never in code
+2. **Input Validation**: Zod schemas prevent injection
+3. **CORS**: Proper configuration
+4. **Session Management**: Express-session with secure cookies
+5. **Rate Limiting**: (TODO for production)
+
 ## 🎯 How It Works
 
 ### Booking Flow
