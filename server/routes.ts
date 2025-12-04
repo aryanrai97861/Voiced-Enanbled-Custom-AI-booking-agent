@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { processConversation, generateSeatingResponse } from "./gemini";
 import { getWeatherForDate } from "./weather";
-import { registerLiveKitRoutes } from "./livekit";
 import { chatRequestSchema, insertBookingSchema } from "@shared/schema";
 import type { BookingContext, ChatResponse, InsertBooking } from "@shared/schema";
 
@@ -11,9 +10,6 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-
-  // Register LiveKit routes
-  registerLiveKitRoutes(app);
 
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
