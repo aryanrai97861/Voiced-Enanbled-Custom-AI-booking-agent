@@ -32,7 +32,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Utensils, Volume2, VolumeX, RefreshCw, AlertCircle, Send } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Utensils, Volume2, VolumeX, RefreshCw, AlertCircle, Send, Info } from "lucide-react";
 import type {
   ConversationMessage,
   BookingContext,
@@ -48,7 +49,7 @@ export default function VoiceAgent() {
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [context, setContext] = useState<BookingContext>(initialContext);
   const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [textInput, setTextInput] = useState("");
 
@@ -169,16 +170,8 @@ export default function VoiceAgent() {
         setMessages([assistantMessage]);
         setContext(data.context);
 
-        if (voiceEnabled) {
-          // Add a small delay to ensure speech synthesis is ready
-          setTimeout(async () => {
-            try {
-              await speak(data.response);
-            } catch (err) {
-              console.log("Initial speech failed:", err);
-            }
-          }, 500);
-        }
+        // Don't auto-speak on initial load to avoid "not-allowed" errors
+        // User must enable voice first (requires user interaction)
       } catch (error) {
         console.error("Failed to initialize greeting:", error);
       } finally {
@@ -280,7 +273,19 @@ export default function VoiceAgent() {
             <Button
               size="icon"
               variant={voiceEnabled ? "default" : "outline"}
-              onClick={() => setVoiceEnabled(!voiceEnabled)}
+              onClick={async () => {
+                const newVoiceState = !voiceEnabled;
+                setVoiceEnabled(newVoiceState);
+                
+                // If enabling voice and there's a greeting message, speak it
+                if (newVoiceState && messages.length > 0 && messages[0].role === 'assistant') {
+                  try {
+                    await speak(messages[0].content);
+                  } catch (err) {
+                    console.log("Could not speak greeting:", err);
+                  }
+                }
+              }}
               data-testid="button-toggle-voice"
             >
               {voiceEnabled ? (
@@ -303,6 +308,15 @@ export default function VoiceAgent() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6">
             <div className="space-y-6">
+              {!voiceEnabled && messages.length > 0 && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Voice is currently off. Click the <Volume2 className="h-3 w-3 inline mx-1" /> button in the header to enable voice responses.
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <ConversationDisplay
                 messages={messages}
                 isLoading={isProcessing || chatMutation.isPending}

@@ -303,7 +303,10 @@ export function useSpeech(options: UseSpeechOptions = {}): UseSpeechReturn {
 
       utterance.onerror = (event) => {
         setStatus("error");
-        reject(new Error(event.error));
+        const errorMsg = event.error === 'not-allowed' 
+          ? 'Speech synthesis requires user interaction first. Please click the voice button or toggle voice on.'
+          : event.error;
+        reject(new Error(errorMsg));
       };
 
       synthRef.current.speak(utterance);
