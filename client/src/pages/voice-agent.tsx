@@ -19,7 +19,7 @@
  * 5. Display booking confirmation
  */
 
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useSpeech } from "@/hooks/use-speech";

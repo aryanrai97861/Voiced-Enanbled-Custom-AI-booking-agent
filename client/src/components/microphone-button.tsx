@@ -1,3 +1,4 @@
+import React from "react";
 import { Mic, MicOff, Loader2, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpeechStatus } from "@/hooks/use-speech";
